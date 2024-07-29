@@ -1,7 +1,9 @@
 mod model;
 
-use clap::{Error, Parser};
-use model::vault::Vault;
+use anyhow::{Error, Result};
+use clap::Parser;
+use model::vault::{Vault, VaultConnection};
+use std::io;
 
 #[derive(Parser)]
 struct Cli {
@@ -11,11 +13,21 @@ struct Cli {
     command: String,
 }
 
-fn main() -> std::result::Result<(), std::io::Error> {
+fn main() -> Result<(), Error> {
     let args = Cli::parse();
 
     println!("Vault: {:?}, Command:{:?}", args.vault, args.command);
 
     let vault = Vault::new(args.vault)?;
-    Ok(println!("{:x?}", vault.salt()))
+    println!("{:x?}", vault.salt());
+
+    let mut pass = String::new();
+    let count = io::stdin().read_line(&mut pass)?;
+    println!("Read {} bytes", count);
+
+    let c = vault.login(pass.as_bytes())?;
+    println!("I'm in");
+
+    let _vault_connection = VaultConnection::new(c);
+    Ok(())
 }
