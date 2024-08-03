@@ -35,12 +35,16 @@ impl Vault {
     pub fn login(&self, password: &[u8]) -> Result<Connection> {
         let derived_key = self.derive_key(password);
 
-        let hex_key = encode(derived_key);
-        let result =
+        let hex_key = encode(&derived_key[0..32]);
+        let connection =
             Connection::open_with_flags(&self.path, rusqlite::OpenFlags::SQLITE_OPEN_READ_ONLY)?;
-        result.execute_batch("PRAGMA CIPHER_COMPATIBILITY=3")?;
-        result.execute_batch(format!(r#"PRAGMA KEY="x'{key}'""#, key = hex_key).as_str())?;
-        Ok(result)
+
+        let pragma_key = format!(r#"PRAGMA key = "x'{key}'";"#, key = hex_key,);
+        connection.execute_batch(&pragma_key)?;
+        connection.pragma_update(None, "cipher_compatibility", "3")?;
+        connection.pragma_update(None, "cipher_page_size", "1024")?;
+
+        Ok(connection)
     }
 }
 

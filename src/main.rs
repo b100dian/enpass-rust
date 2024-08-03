@@ -9,11 +9,10 @@ use std::io;
 struct Cli {
     #[arg(short, long)]
     vault: std::path::PathBuf,
-
     command: String,
 }
 
-fn main() -> Result<(), Error> {
+fn main() -> Result<()> {
     let args = Cli::parse();
 
     println!("Vault: {:?}, Command:{:?}", args.vault, args.command);
@@ -22,11 +21,9 @@ fn main() -> Result<(), Error> {
     println!("{:x?}", vault.salt());
 
     let mut pass = String::new();
-    let count = io::stdin().read_line(&mut pass)?;
-    println!("Read {} bytes", count);
+    io::stdin().read_line(&mut pass)?;
 
-    let c = vault.login(pass.as_bytes())?;
-    println!("I'm in");
+    let c = vault.login(pass.trim_end().as_bytes())?;
 
     let _vault_connection = VaultConnection::new(c);
     Ok(())
