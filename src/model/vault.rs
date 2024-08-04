@@ -12,10 +12,6 @@ pub struct Vault {
     salt: [u8; 16],
 }
 
-pub struct VaultConnection {
-    connection: Connection,
-}
-
 impl Vault {
     pub fn new(path: std::path::PathBuf) -> std::io::Result<Vault> {
         let mut db_file = File::open(&path)?;
@@ -34,22 +30,16 @@ impl Vault {
 
     pub fn login(&self, password: &[u8]) -> Result<Connection> {
         let derived_key = self.derive_key(password);
-
         let hex_key = encode(&derived_key[0..32]);
+        println!("Using key {}", &hex_key);
         let connection =
             Connection::open_with_flags(&self.path, rusqlite::OpenFlags::SQLITE_OPEN_READ_ONLY)?;
 
-        let pragma_key = format!(r#"PRAGMA key = "x'{key}'";"#, key = hex_key,);
+        let pragma_key = format!(r#"PRAGMA key = "x'{key}'";"#, key = hex_key);
         connection.execute_batch(&pragma_key)?;
         connection.pragma_update(None, "cipher_compatibility", "3")?;
         connection.pragma_update(None, "cipher_page_size", "1024")?;
 
         Ok(connection)
-    }
-}
-
-impl VaultConnection {
-    pub fn new(connection: Connection) -> VaultConnection {
-        return VaultConnection { connection };
     }
 }
