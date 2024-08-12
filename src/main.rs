@@ -19,17 +19,20 @@ struct Cli {
 enum Commands {
     /// List the items in the vault
     List {},
+    Password {
+        item_id: u32,
+    },
 }
 
 fn main() -> Result<()> {
     let args = Cli::parse();
 
     match &args.command {
-        Some(Commands::List {}) => {}
         None => {
             println!("{}", Cli::command().render_usage());
             std::process::exit(1);
         }
+        _ => {}
     };
 
     let vault = Vault::new(args.vault)?;
@@ -40,10 +43,19 @@ fn main() -> Result<()> {
 
     let connection = vault.login(pass.trim_end().as_bytes())?;
 
-    let vault_connection = VaultCommand::new(connection);
-    let items = vault_connection.list()?;
-    for item in items {
-        println!("{}", item);
+    let vault_command = VaultCommand::new(connection);
+
+    match &args.command {
+        Some(Commands::List {}) | None => {
+            let items = vault_command.list()?;
+            for item in items {
+                println!("{}", item);
+            }
+        }
+        Some(Commands::Password { item_id }) => {
+            let password = vault_command.password(item_id)?;
+            println!("{}", password);
+        }
     }
 
     Ok(())

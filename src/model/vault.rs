@@ -20,10 +20,6 @@ impl Vault {
         Ok(Vault { path, salt })
     }
 
-    pub fn salt(&self) -> [u8; 16] {
-        self.salt
-    }
-
     fn derive_key(&self, password: &[u8]) -> Key64 {
         return pbkdf2::pbkdf2_hmac_array::<sha2::Sha512, 64>(password, &self.salt, 320000);
     }
