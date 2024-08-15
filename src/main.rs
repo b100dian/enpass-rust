@@ -38,7 +38,7 @@ fn main() -> Result<()> {
     let vault = Vault::new(args.vault)?;
 
     let mut pass = String::new();
-    println!("Enter vault password:");
+    eprintln!("Enter vault password:");
     io::stdin().read_line(&mut pass)?;
 
     let connection = vault.login(pass.trim_end().as_bytes())?;
