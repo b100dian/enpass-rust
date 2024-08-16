@@ -1,6 +1,5 @@
 mod model;
 
-use anyhow::Result;
 use clap::CommandFactory;
 use clap::{Parser, Subcommand};
 use model::vault::Vault;
@@ -24,7 +23,7 @@ enum Commands {
     },
 }
 
-fn main() -> Result<()> {
+fn main() -> anyhow::Result<()> {
     let args = Cli::parse();
 
     match &args.command {
@@ -42,7 +41,6 @@ fn main() -> Result<()> {
     io::stdin().read_line(&mut pass)?;
 
     let connection = vault.login(pass.trim_end().as_bytes())?;
-
     let vault_command = VaultCommand::new(connection);
 
     match &args.command {
