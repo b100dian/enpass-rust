@@ -1,9 +1,7 @@
-mod model;
-
 use clap::CommandFactory;
 use clap::{Parser, Subcommand};
-use model::vault::Vault;
-use model::vaultcommand::VaultCommand;
+use enpass::lite::vault::Vault;
+use enpass::lite::vaultcommand::VaultCommand;
 use std::io;
 
 #[derive(Parser)]

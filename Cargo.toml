@@ -3,12 +3,10 @@ name = "enpass-rust"
 version = "0.1.0"
 edition = "2021"
 
+[workspace]
+exclude = ["lite"]
+
 [dependencies]
-aes-gcm = { version = "0.10.3", features = ["std"] }
 anyhow = "1.0.86"
 clap = { version = "4.5.11", features = ["derive"] }
-hex = "0.4.3"
-pbkdf2 = "0.12.2"
-rusqlite = { version = "0.32.1", features = ["sqlcipher"] }
-sha2 = "0.10.8"
-thiserror = "1.0.63"
+enpass = { path = "lite" }
