@@ -4,6 +4,8 @@ Version:    0.1
 Release:    1
 License:    LICENSE
 Source0:    %{name}-%{version}.tar.bz2
+Source100: vendor.tar.xz
+
 Requires:   sqlcipher
 BuildRequires:  sqlcipher-devel
 BuildRequires:  rust >= 1.52.1+git1-1
@@ -14,6 +16,20 @@ BuildRequires:  rust-std-static
 Command line enpass client written in rust.
 
 %prep
+%setup -q -n %{name}-%{version}
+# seems to need local stuff
+tar -xJf %SOURCE100
+
+# define the offline registry
+%global cargo_home $PWD/.cargo
+mkdir -p %{cargo_home}
+cat >.cargo/config <<EOF
+[source.crates-io]
+replace-with = "vendored-sources"
+
+[source.vendored-sources]
+directory = "vendor"
+EOF
 
 %build
 rustc --version
@@ -81,7 +97,7 @@ cargo build \
   -j 1 \
   --verbose \
   --release \
-  --manifest-path %{_sourcedir}/../Cargo.toml
+  --offline
 
 %install
 #TODO rm -rf %{buildroot}
