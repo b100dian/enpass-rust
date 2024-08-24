@@ -2,7 +2,6 @@ use clap::CommandFactory;
 use clap::{Parser, Subcommand};
 use enpass::lite::vault::Vault;
 use enpass::lite::vaultcommand::VaultCommand;
-use std::io;
 
 #[derive(Parser)]
 struct Cli {
@@ -34,9 +33,7 @@ fn main() -> anyhow::Result<()> {
 
     let vault = Vault::new(args.vault)?;
 
-    let mut pass = String::new();
-    eprintln!("Enter vault password:");
-    io::stdin().read_line(&mut pass)?;
+    let pass = rpassword::prompt_password("Enter vault password:")?;
 
     let connection = vault.login(pass.trim_end().as_bytes())?;
     let vault_command = VaultCommand::new(connection);
