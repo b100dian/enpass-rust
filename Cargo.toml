@@ -10,4 +10,5 @@ exclude = ["lite"]
 anyhow = "1.0.86"
 clap = { version = "4.5.11", features = ["derive"] }
 enpass = { path = "lite" }
+flexi_logger = "0.28.5"
 rpassword = "7.3.1"

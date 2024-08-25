@@ -7,6 +7,9 @@ edition = "2021"
 aes-gcm = { version = "0.10.3", features = ["std"] }
 hex = "0.4.3"
 pbkdf2 = "0.12.2"
-rusqlite = { version = "=0.31.0", features = ["sqlcipher"] }
+rusqlite = { version = "=0.31.0", features = ["sqlcipher", "load_extension"] }
 sha2 = "0.10.8"
 thiserror = "1.0.63"
+memmap = "0.7.0"
+log = "0.4.22"
+json = "0.12.4"

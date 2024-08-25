@@ -21,17 +21,18 @@ enum Commands {
 }
 
 fn main() -> anyhow::Result<()> {
+    flexi_logger::Logger::try_with_env_or_str("info")?.start()?;
     let args = Cli::parse();
 
     match &args.command {
         None => {
-            println!("{}", Cli::command().render_usage());
+            eprintln!("{}", Cli::command().render_usage());
             std::process::exit(1);
         }
         _ => {}
     };
 
-    let vault = Vault::new(args.vault)?;
+    let mut vault = Vault::new(args.vault)?;
 
     let pass = rpassword::prompt_password("Enter vault password:")?;
 

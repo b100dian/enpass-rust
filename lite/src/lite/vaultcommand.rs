@@ -72,7 +72,11 @@ impl VaultCommand {
         }
     }
 
-    fn decrypt(password: String, uuid: String, item_key: Vec<u8>) -> Result<String, VaultError> {
+    fn decrypt_password(
+        password: String,
+        uuid: String,
+        item_key: Vec<u8>,
+    ) -> Result<String, VaultError> {
         let key = &item_key[..32];
         let nonce = &item_key[32..];
         let cipher = Aes256Gcm::new_from_slice(key)?;
@@ -105,7 +109,11 @@ impl VaultCommand {
             if let Ok(matched) = result {
                 Ok(Password {
                     username: matched.username,
-                    password: VaultCommand::decrypt(matched.password, item.uuid, item.key)?,
+                    password: VaultCommand::decrypt_password(
+                        matched.password,
+                        item.uuid,
+                        item.key,
+                    )?,
                 })
             } else {
                 let vault_error = VaultItemNotFound { id: *id };
