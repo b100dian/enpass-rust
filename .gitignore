@@ -1,1 +1,7 @@
 /target
+#SFOS build
+.cargo/
+rpm/vendor.tar.xz
+sfos/
+vendor/
+
