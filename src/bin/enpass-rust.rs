@@ -18,6 +18,9 @@ enum Commands {
     Password {
         item_id: u32,
     },
+    Dump {
+        item_id: u32,
+    },
 }
 
 fn main() -> anyhow::Result<()> {
@@ -49,6 +52,12 @@ fn main() -> anyhow::Result<()> {
         Some(Commands::Password { item_id }) => {
             let password = vault_command.password(item_id)?;
             println!("{}", password);
+        }
+        Some(Commands::Dump { item_id }) => {
+            let dump = vault_command.dump(item_id)?;
+            for kv in dump {
+                println!("{}\t{}", kv.key, kv.value);
+            }
         }
     }
 

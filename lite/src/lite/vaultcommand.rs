@@ -21,6 +21,11 @@ pub struct Password {
     password: String,
 }
 
+pub struct KeyValue {
+    pub key: String,
+    pub value: String,
+}
+
 impl fmt::Display for ListItem {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "{}\t{}", self.id, self.title)
@@ -74,8 +79,8 @@ impl VaultCommand {
 
     fn decrypt_password(
         password: String,
-        uuid: String,
-        item_key: Vec<u8>,
+        uuid: &String,
+        item_key: &Vec<u8>,
     ) -> Result<String, VaultError> {
         let key = &item_key[..32];
         let nonce = &item_key[32..];
@@ -111,17 +116,54 @@ impl VaultCommand {
                     username: matched.username,
                     password: VaultCommand::decrypt_password(
                         matched.password,
-                        item.uuid,
-                        item.key,
+                        &item.uuid,
+                        &item.key,
                     )?,
                 })
             } else {
                 let vault_error = VaultItemNotFound { id: *id };
                 Err(VaultError::VaultItemNotFound(vault_error))
             }
+            // TODO v These ^ look so much the same.
         } else {
             let vault_error = VaultItemNotFound { id: *id };
             Err(VaultError::VaultItemNotFound(vault_error))
         }
+    }
+
+    pub fn dump(self, id: &u32) -> Result<Vec<KeyValue>, VaultError> {
+        let item = self.item_details(id)?;
+        let mut stmt = self.connection.prepare(
+            "select type, value from itemfield where item_uuid = (?1) order by \"order\" asc",
+        )?;
+        let results = stmt.query_map([&item.uuid], |row: &Row| -> Result<KeyValue> {
+            Ok(KeyValue {
+                key: row.get(0)?,
+                value: row.get(1)?,
+            })
+        });
+
+        let dump = results?
+            .map(|row| -> Result<KeyValue, VaultError> {
+                let field = row.unwrap();
+                Ok(KeyValue {
+                    key: field.key.clone(),
+                    value: match field.key.as_str() {
+                        "password" => match field.value.as_str() {
+                            "" => "".to_string(),
+                            _ => {
+                                VaultCommand::decrypt_password(field.value, &item.uuid, &item.key)?
+                            }
+                        },
+                        _ => field.value,
+                    },
+                })
+            })
+            .filter(|row| match row {
+                Ok(field) => !field.value.is_empty(),
+                _ => false,
+            })
+            .map(|x| x.unwrap());
+        Ok(dump.collect())
     }
 }
