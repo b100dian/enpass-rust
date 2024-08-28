@@ -6,6 +6,7 @@ use aes_gcm::{
     Aes256Gcm, KeyInit,
 };
 use rusqlite::{Connection, Result, Row};
+use totp_rfc6238::TotpGenerator;
 
 pub struct VaultCommand {
     connection: Connection,
@@ -155,6 +156,19 @@ impl VaultCommand {
                                 VaultCommand::decrypt_password(field.value, &item.uuid, &item.key)?
                             }
                         },
+                        "totp" => {
+                            let totp_key = base32::decode(
+                                base32::Alphabet::Rfc4648Lower { padding: false },
+                                &field.value,
+                            );
+                            match totp_key {
+                                Some(key) => {
+                                    let totp = TotpGenerator::new().build();
+                                    format!("{} => {}", field.value, totp.get_code(&key))
+                                }
+                                None => field.value,
+                            }
+                        }
                         _ => field.value,
                     },
                 })
