@@ -1,10 +1,10 @@
 Name:       enpass-rust
 Summary:    Enpass-rust
-Version:    0.1
+Version:    0.2.0
 Release:    1
 License:    LICENSE
 Source0:    %{name}-%{version}.tar.bz2
-Source1: vendor.tar.xz
+Source1:    https://github.com/b100dian/enpass-rust/releases/download/%{version}/vendor-%{version}.tar.xz
 
 Requires:   sqlcipher
 BuildRequires:  sqlcipher-devel
@@ -32,7 +32,9 @@ Command line enpass client written in rust.
 
 
 # seems to need local stuff
+%if 0%{?sailfishos_version}
 tar -xJf %SOURCE1
+%endif
 
 # define the offline registry
 %global cargo_home $PWD/.cargo
