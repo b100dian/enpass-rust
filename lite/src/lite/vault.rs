@@ -52,7 +52,7 @@ impl Vault {
     fn load_memvfs(&self, conn: &Connection) -> Result<()> {
         unsafe {
             let _guard = LoadExtensionGuard::new(conn)?;
-            conn.load_extension("./memvfs", None)
+            conn.load_extension("libmemvfs", None)
         }
     }
 

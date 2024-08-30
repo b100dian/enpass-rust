@@ -1,16 +1,18 @@
 Name:       enpass-rust
 Summary:    Enpass-rust
-Version:    0.2.0
+Version:    0.2.1
 Release:    1
 License:    LICENSE
 Source0:    %{name}-%{version}.tar.bz2
 Source1:    https://github.com/b100dian/enpass-rust/releases/download/%{version}/vendor-%{version}.tar.xz
+Source2:    https://sqlite.org/src/raw/7dffa8cc89c7f2d73da4bd4ccea1bcbd2bd283e3bb4cea398df7c372a197291b?at=memvfs.c
 
 Requires:   sqlcipher
 BuildRequires:  sqlcipher-devel
-BuildRequires:  rust >= 1.52.1+git1-1
-BuildRequires:  cargo >= 1.52.1+git1-1
+BuildRequires:  rust >= 1.75
+BuildRequires:  cargo >= 1.75
 BuildRequires:  rust-std-static
+BuildRequires:  sqlite-devel
 
 %description
 Command line enpass client written in rust.
@@ -51,6 +53,9 @@ EOF
 export CARGO_HOME="%{cargo_home}"
 
 %build
+
+# Build libmemvfs.so
+gcc -g -fPIC -shared %SOURCE2 -o libmemvfs.so
 
 # Adopted from https://github.com/sailfishos/gecko-dev/blob/master/rpm/xulrunner-qt5.spec
 
@@ -104,7 +109,7 @@ cargo build --offline -j1 --release --target-dir=%{BUILD_DIR}
 %install
 mkdir -p %{buildroot}/%{_bindir}
 install %{BUILD_DIR}/%{SB2_TARGET}/release/%{name} %{buildroot}/%{_bindir}/%{name}
-
+install libmemvfs.so %{buildroot}/%{_libdir}/libmemvfs.so
 
 %files
 %defattr(-,root,root,-)
