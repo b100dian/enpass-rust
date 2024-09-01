@@ -5,7 +5,7 @@ Release:    1
 License:    LICENSE
 Source0:    %{name}-%{version}.tar.bz2
 Source1:    https://github.com/b100dian/enpass-rust/releases/download/%{version}/vendor-%{version}.tar.xz
-Source2:    https://sqlite.org/src/raw/7dffa8cc89c7f2d73da4bd4ccea1bcbd2bd283e3bb4cea398df7c372a197291b?at=memvfs.c
+Source2:    https://sqlite.org/src/raw/7dffa8cc89c7f2d73da4bd4ccea1bcbd2bd283e3bb4cea398df7c372a197291b?at=memvfs.c#/memvfs.c
 
 Requires:   sqlcipher
 BuildRequires:  sqlcipher-devel
