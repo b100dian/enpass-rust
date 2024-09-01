@@ -1,5 +1,6 @@
 [package]
 name = "enpass-rust"
+description = "Enpass client written in rust."
 version = "0.2.0"
 edition = "2021"
 
