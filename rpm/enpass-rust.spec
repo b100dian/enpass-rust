@@ -54,8 +54,9 @@ export CARGO_HOME="%{cargo_home}"
 
 %build
 
+mkdir -p %{BUILD_DIR}
 # Build libmemvfs.so
-gcc -g -fPIC -shared %SOURCE2 -o libmemvfs.so
+gcc -g -fPIC -shared %SOURCE2 -o %{BUILD_DIR}/libmemvfs.so
 
 # Adopted from https://github.com/sailfishos/gecko-dev/blob/master/rpm/xulrunner-qt5.spec
 
@@ -103,8 +104,6 @@ export CARGOFLAGS=" %{?offline_flag:--offline}"
 
 %if 0%{?offline_flag}
 export CARGO_NET_OFFLINE="true"
-%else
-#cargo update --locked
 %endif
 
 cargo build %{?offline_flag:--offline} -j1 --release --target-dir=%{BUILD_DIR}
@@ -112,10 +111,14 @@ cargo build %{?offline_flag:--offline} -j1 --release --target-dir=%{BUILD_DIR}
 %install
 mkdir -p %{buildroot}/%{_bindir}
 install %{BUILD_DIR}/%{SB2_TARGET}/release/%{name} %{buildroot}/%{_bindir}/%{name}
-install libmemvfs.so %{buildroot}/%{_libdir}/libmemvfs.so
+mkdir -p %{buildroot}%{_libdir}
+install %{BUILD_DIR}/libmemvfs.so %{buildroot}%{_libdir}/libmemvfs.so
+install %{BUILD_DIR}/%{SB2_TARGET}/release/libenpass.so %{buildroot}%{_libdir}/libenpass.so
 
 %files
 %defattr(-,root,root,-)
 %defattr(0644,root,root,-)
 %defattr(0755,root,root,-)
-%{_bindir}/*
+%{_bindir}/%{name}
+%{_libdir}/libmemvfs.so
+%{_libdir}/libenpass.so
