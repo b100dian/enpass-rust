@@ -32,11 +32,10 @@ Command line enpass client written in rust.
 %define SB2_TARGET i686-unknown-linux-gnu
 %endif
 
-
 # seems to need local stuff
 %if 0%{?sailfishos_version}
 tar -xJf %SOURCE1
-%endif
+%define offline_flag 1
 
 # define the offline registry
 %global cargo_home $PWD/.cargo
@@ -51,6 +50,7 @@ EOF
 
 # use our offline registry
 export CARGO_HOME="%{cargo_home}"
+%endif
 
 %build
 
@@ -99,12 +99,15 @@ export PKG_CONFIG="pkg-config"
 #
 #export CRATE_CC_NO_DEFAULTS=1
 
-export CARGOFLAGS=" --offline"
-export CARGO_NET_OFFLINE=1"
-export CARGO_BUILD_TARGET=armv7-unknown-linux-gnueabihf
-export CARGO_CFG_TARGET_ARCH=arm"
+export CARGOFLAGS=" %{?offline_flag:--offline}"
 
-cargo build --offline -j1 --release --target-dir=%{BUILD_DIR}
+%if 0%{?offline_flag}
+export CARGO_NET_OFFLINE="true"
+%else
+#cargo update --locked
+%endif
+
+cargo build %{?offline_flag:--offline} -j1 --release --target-dir=%{BUILD_DIR}
 
 %install
 mkdir -p %{buildroot}/%{_bindir}
