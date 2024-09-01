@@ -12,3 +12,9 @@ clap = { version = "4.5.11", features = ["derive"] }
 enpass = { path = "lite" }
 flexi_logger = "0.28.5"
 rpassword = "7.3.1"
+
+[profile.release]
+opt-level = 'z'   # Optimize for size
+lto = true        # Enable link-time optimization
+codegen-units = 1 # Reduce number of codegen units to increase optimizations
+strip = true      # Strip symbols from binary*
